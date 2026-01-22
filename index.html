@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bee Swarm Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: auto;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(135, 206, 235, 0.3);
+            pointer-events: none;
+        }
+
+        .floating-bee {
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            pointer-events: none;
+            z-index: 1;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -30px) rotate(10deg); }
+            50% { transform: translate(-15px, -50px) rotate(-10deg); }
+            75% { transform: translate(25px, -25px) rotate(5deg); }
+        }
+
+        .profile-container {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 235, 59, 0.95), rgba(255, 193, 7, 0.95));
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 700px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 
+                        0 0 0 8px rgba(255, 215, 0, 0.5),
+                        inset 0 0 30px rgba(255, 255, 255, 0.3);
+            animation: slideIn 0.8s ease-out;
+            z-index: 10;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .decoration-frame {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120%;
+            height: 120%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .hexagon {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 215, 0, 0.6);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            animation: rotate 10s linear infinite;
+        }
+
+        .hexagon:nth-child(1) { top: -20px; left: 10%; animation-delay: 0s; }
+        .hexagon:nth-child(2) { top: -20px; right: 10%; animation-delay: -3s; }
+        .hexagon:nth-child(3) { bottom: -20px; left: 15%; animation-delay: -6s; }
+        .hexagon:nth-child(4) { bottom: -20px; right: 15%; animation-delay: -9s; }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar-decoration {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 240px;
+            height: 240px;
+            pointer-events: none;
+        }
+
+        .hexagon-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: rotate 20s linear infinite;
+        }
+
+        .hex-piece {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            opacity: 0.8;
+        }
+
+        .honey-drip {
+            position: absolute;
+            width: 12px;
+            height: 20px;
+            background: linear-gradient(to bottom, #FFD700, #FFA500);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0.9;
+            animation: drip 3s ease-in-out infinite;
+        }
+
+        @keyframes drip {
+            0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.9; }
+            50% { transform: translateY(8px) scaleY(1.2); opacity: 0.6; }
+        }
+
+        .bear-decoration {
+            position: absolute;
+            bottom: -15px;
+            right: -15px;
+            width: 70px;
+            height: 70px;
+            background-image: url('brownbear.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            animation: bearBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        @keyframes bearBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 6px solid #fff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+                        0 0 0 3px rgba(255, 215, 0, 0.8);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4),
+                        0 0 0 3px rgba(255, 215, 0, 1),
+                        0 0 20px rgba(255, 215, 0, 0.8);
+        }
+
+        .bee-decoration {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            top: -10px;
+            right: -10px;
+            animation: buzz 1.5s ease-in-out infinite;
+        }
+
+        @keyframes buzz {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(3px, -3px); }
+            50% { transform: translate(-3px, 3px); }
+            75% { transform: translate(3px, 3px); }
+        }
+
+        .username {
+            font-size: 36px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5),
+                         0 0 10px rgba(255, 215, 0, 0.8);
+            animation: glow 2s ease-in-out infinite;
+            flex: 1;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.8); }
+            50% { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 1); }
+        }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: linear-gradient(90deg, rgba(255, 235, 59, 0.3), transparent);
+            border-radius: 10px;
+            transition: background 0.3s ease;
+            position: relative;
+        }
+
+        .info-item:hover {
+            background: linear-gradient(90deg, rgba(255, 235, 59, 0.5), rgba(255, 193, 7, 0.3));
+        }
+
+        .info-item::before {
+            content: '';
+            width: 52px;
+            height: 52px;
+            margin-right: 12px;
+            background-image: url('fuzzybee.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: inline-block;
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #F57C00;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 16px;
+        }
+
+        .bio-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .bio-text {
+            color: #333;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .audio-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .mute-button {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .mute-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #F57C00, #FF9800);
+        }
+
+        .mute-button:active {
+            transform: scale(0.95);
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: rgba(0, 0, 0, 0.85);
+            color: #FFD700;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            z-index: 100;
+        }
+
+        .info-item:hover .tooltip {
+            transform: translateX(-50%) scale(1);
+            opacity: 1;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.85);
+        }
+
+        .honey-drops {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .drop {
+            position: absolute;
+            width: 15px;
+            height: 20px;
+            background: radial-gradient(ellipse at center, #FFD700 0%, #FFA500 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0.6;
+            animation: fall 5s linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 10px;
+            height: 15px;
+            background: radial-gradient(ellipse at center, #FFD700 0%, #FFA500 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            animation: trailFade 0.8s ease-out forwards;
+        }
+
+        @keyframes trailFade {
+            0% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.3) translateY(20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="honey-drops" id="honeyDrops"></div>
+
+    <div class="floating-bee" style="top: 10%; left: 10%;">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" fill="#FFD700" stroke="#000" stroke-width="1"/>
+            <rect x="7" y="9" width="10" height="2.5" rx="1" fill="#000"/>
+            <rect x="7" y="12.5" width="10" height="2.5" rx="1" fill="#000"/>
+            <circle cx="8.5" cy="8" r="1.5" fill="#000"/>
+            <circle cx="15.5" cy="8" r="1.5" fill="#000"/>
+            <ellipse cx="5" cy="12" rx="3.5" ry="1.5" fill="#E3F2FD" opacity="0.7"/>
+            <ellipse cx="19" cy="12" rx="3.5" ry="1.5" fill="#E3F2FD" opacity="0.7"/>
+        </svg>
+    </div>
+
+    <div class="floating-bee" style="top: 70%; right: 15%;">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" fill="#FFD700" stroke="#000" stroke-width="1"/>
+            <rect x="7" y="9" width="10" height="2.5" rx="1" fill="#000"/>
+            <rect x="7" y="12.5" width="10" height="2.5" rx="1" fill="#000"/>
+            <circle cx="8.5" cy="8" r="1.5" fill="#000"/>
+            <circle cx="15.5" cy="8" r="1.5" fill="#000"/>
+            <ellipse cx="5" cy="12" rx="3.5" ry="1.5" fill="#E3F2FD" opacity="0.7"/>
+            <ellipse cx="19" cy="12" rx="3.5" ry="1.5" fill="#E3F2FD" opacity="0.7"/>
+        </svg>
+    </div>
+
+    <div class="profile-container">
+        <div class="decoration-frame">
+            <div class="hexagon"></div>
+            <div class="hexagon"></div>
+            <div class="hexagon"></div>
+            <div class="hexagon"></div>
+        </div>
+
+        <div class="profile-header">
+            <div class="avatar-wrapper">
+                <div class="avatar-decoration">
+                    <div class="hexagon-ring">
+                        <div class="hex-piece" style="top: 0; left: 50%; transform: translateX(-50%);"></div>
+                        <div class="hex-piece" style="top: 15%; right: 10%;"></div>
+                        <div class="hex-piece" style="top: 50%; right: 0; transform: translateY(-50%);"></div>
+                        <div class="hex-piece" style="bottom: 15%; right: 10%;"></div>
+                        <div class="hex-piece" style="bottom: 0; left: 50%; transform: translateX(-50%);"></div>
+                        <div class="hex-piece" style="bottom: 15%; left: 10%;"></div>
+                        <div class="hex-piece" style="top: 50%; left: 0; transform: translateY(-50%);"></div>
+                        <div class="hex-piece" style="top: 15%; left: 10%;"></div>
+                        
+                        <div class="honey-drip" style="top: 10%; left: 20%;"></div>
+                        <div class="honey-drip" style="top: 20%; right: 25%; animation-delay: 0.5s;"></div>
+                        <div class="honey-drip" style="bottom: 25%; left: 15%; animation-delay: 1s;"></div>
+                        <div class="honey-drip" style="bottom: 20%; right: 20%; animation-delay: 1.5s;"></div>
+                        <div class="honey-drip" style="top: 60%; left: 8%; animation-delay: 0.8s;"></div>
+                        <div class="honey-drip" style="top: 55%; right: 12%; animation-delay: 1.2s;"></div>
+                    </div>
+                </div>
+                <img src="profile.png" alt="Profile" class="avatar">
+                <div class="bear-decoration"></div>
+                <div class="bee-decoration">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" fill="#FFD700" stroke="#000" stroke-width="1"/>
+                        <rect x="7" y="9" width="10" height="2.5" rx="1" fill="#000"/>
+                        <rect x="7" y="12.5" width="10" height="2.5" rx="1" fill="#000"/>
+                        <circle cx="8.5" cy="8" r="1.5" fill="#000"/>
+                        <circle cx="15.5" cy="8" r="1.5" fill="#000"/>
+                        <ellipse cx="5" cy="12" rx="3.5" ry="1.5" fill="#E3F2FD" opacity="0.7"/>
+                        <ellipse cx="19" cy="12" rx="3.5" ry="1.5" fill="#E3F2FD" opacity="0.7"/>
+                    </svg>
+                </div>
+            </div>
+            <h1 class="username">Ezhike</h1>
+        </div>
+
+        <div class="info-section">
+            <div class="info-item">
+                <span class="info-label">Country:</span>
+                <span class="info-value">Kazakhstan</span>
+            </div>
+        </div>
+
+        <div class="bio-section">
+            <h3 style="color: #F57C00; margin-bottom: 10px; text-align: center;">📝 About Me</h3>
+            <p class="bio-text">
+                Why you acting like a stranger, what's with your behaviour
+            </p>
+        </div>
+
+        <audio id="bgMusic" loop autoplay>
+            <source src="audio.mp3" type="audio/mpeg">
+        </audio>
+
+        <button class="mute-button" onclick="toggleAudio()">
+            <span id="audioIcon">🔊</span> <span id="audioText">Mute</span>
+        </button>
+
+    <script>
+        let isMuted = false;
+        const audio = document.getElementById('bgMusic');
+        
+        function toggleAudio() {
+            const icon = document.getElementById('audioIcon');
+            const text = document.getElementById('audioText');
+            
+            if (isMuted) {
+                audio.play();
+                icon.textContent = '🔊';
+                text.textContent = 'Mute';
+            } else {
+                audio.pause();
+                icon.textContent = '🔇';
+                text.textContent = 'Unmute';
+            }
+            isMuted = !isMuted;
+        }
+
+        // Create honey drops
+        const honeyDrops = document.getElementById('honeyDrops');
+        for (let i = 0; i < 15; i++) {
+            const drop = document.createElement('div');
+            drop.className = 'drop';
+            drop.style.left = Math.random() * 100 + '%';
+            drop.style.animationDelay = Math.random() * 5 + 's';
+            drop.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            honeyDrops.appendChild(drop);
+        }
+
+        // Handle autoplay restrictions
+        audio.play().catch(() => {
+            isMuted = true;
+            document.getElementById('audioIcon').textContent = '🔇';
+            document.getElementById('audioText').textContent = 'Unmute';
+        });
+
+        // Cursor trail effect
+        let lastTrailTime = 0;
+        document.addEventListener('mousemove', (e) => {
+            const now = Date.now();
+            if (now - lastTrailTime > 50) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                trail.style.left = e.clientX + 'px';
+                trail.style.top = e.clientY + 'px';
+                document.body.appendChild(trail);
+                
+                setTimeout(() => {
+                    trail.remove();
+                }, 800);
+                
+                lastTrailTime = now;
+            }
+        });
+    </script>
+</body>
+</html>
