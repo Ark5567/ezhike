@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ark</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0f0f0f;
+      color: #f0f0f0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom Cursor */
+    #cursor {
+      position: fixed;
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid #fff;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      mix-blend-mode: difference;
+      transition: transform 0.15s ease;
+    }
+
+    #cursor-follower {
+      position: fixed;
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9998;
+      transition: transform 0.3s ease;
+    }
+
+    /* Mute Button */
+    #mute-btn {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(30, 30, 30, 0.6);
+      border: 1px solid #333;
+      color: #ccc;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.2s ease;
+    }
+
+    #mute-btn:hover {
+      background: rgba(50, 50, 50, 0.8);
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    /* Main Card */
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #2d2d2d;
+      border-radius: 16px;
+      padding: 2.2rem;
+      max-width: 800px;
+      width: 90%;
+      display: flex;
+      gap: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .profile-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-width: 180px;
+    }
+
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #333;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .profile-pic:hover {
+      border-color: #666;
+      transform: scale(1.05);
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.1);
+    }
+
+    .info-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .name-box {
+      background: #222;
+      border-left: 3px solid #666;
+      padding: 0.8rem 1.2rem;
+      display: inline-block;
+      margin-bottom: 1.2rem;
+      border-radius: 0 8px 8px 0;
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .bio {
+      font-size: 1.1rem;
+      color: #ccc;
+      margin: 0.6rem 0 1.4rem;
+      line-height: 1.5;
+    }
+
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #aaa;
+      font-size: 0.95rem;
+      margin-bottom: 1.6rem;
+    }
+
+    /* Social Icons */
+    .socials {
+      display: flex;
+      gap: 18px;
+    }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #252525;
+      color: #ddd;
+      font-size: 18px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      border: 1px solid #333;
+      cursor: pointer;
+    }
+
+    .social-link:hover {
+      background: #333;
+      color: #fff;
+      transform: translateY(-3px);
+      border-color: #444;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(30, 30, 30, 0.95);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 650px) {
+      .card {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+      }
+      .name-box {
+        border-radius: 8px;
+        border-left: none;
+        border-top: 3px solid #666;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Mute Button -->
+  <button id="mute-btn" title="Mute audio">
+    <i class="fas fa-volume-up"></i>
+  </button>
+
+  <!-- Toast -->
+  <div id="toast">Copied Discord username!</div>
+
+  <!-- Custom Cursor -->
+  <div id="cursor"></div>
+  <div id="cursor-follower"></div>
+
+  <!-- Hidden Audio -->
+  <audio id="bg-audio" loop>
+    <source src="audio.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="card">
+    <div class="profile-section">
+      <img src="profile.png" alt="Ark" class="profile-pic" />
+    </div>
+
+    <div class="info-section">
+      <div class="name-box">
+        <h1>Ezhik</h1>
+      </div>
+      <p class="bio">Why you acting like a stranger, what's with your behaviour</p>
+      <div class="location">
+        <i class="fas fa-map-pin"></i>
+        <span>Kazakhstan</span>
+      </div>
+      <div class="socials">
+        <!-- Steam -->
+        <a href="https://steamcommunity.com/profiles/76561199516152700/" target="_blank" class="social-link" title="Steam">
+          <i class="fab fa-steam"></i>
+        </a>
+
+        <!-- Discord: COPY USERNAME -->
+        <div id="discord-copy" class="social-link" title="Copy Discord username">
+          <i class="fab fa-discord"></i>
+        </div>
+
+        <!-- Gmail -->
+        <a href="mailto:abbasdeeb54@gmail.com" class="social-link" title="Gmail">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Audio control
+    const audio = document.getElementById('bg-audio');
+    const muteBtn = document.getElementById('mute-btn');
+    let isMuted = false;
+
+    function initAudio() {
+      audio.play().catch(e => console.log("Autoplay blocked – will play after interaction"));
+    }
+    document.body.addEventListener('click', initAudio, { once: true });
+
+    muteBtn.addEventListener('click', () => {
+      if (isMuted) {
+        audio.play();
+        muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+        isMuted = false;
+      } else {
+        audio.pause();
+        muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+        isMuted = true;
+      }
+    });
+
+    // Copy Discord username
+    const discordBtn = document.getElementById('discord-copy');
+    const toast = document.getElementById('toast');
+
+    discordBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText('ark.no1').then(() => {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    });
+
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const follower = document.getElementById('cursor-follower');
+
+    document.addEventListener('mousemove', (e) => {
+      const x = e.clientX;
+      const y = e.clientY;
+      cursor.style.left = x + 'px';
+      cursor.style.top = y + 'px';
+      follower.style.left = x + 'px';
+      follower.style.top = y + 'px';
+    });
+
+    // Cursor interaction
+    const interactives = document.querySelectorAll('.social-link, .profile-pic, #mute-btn');
+    interactives.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'translate(-50%, -50%) scale(1.4)';
+        follower.style.transform = 'translate(-50%, -50%) scale(0.8)';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+        follower.style.transform = 'translate(-50%, -50%) scale(1)';
+      });
+    });
+  </script>
+</body>
+</html>
